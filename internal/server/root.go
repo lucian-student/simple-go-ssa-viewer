@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"ssa-viewer/internal/handler"
 	"syscall"
 	"time"
 )
@@ -22,6 +23,7 @@ func Listen(options *ServerOptions) error {
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Server is running locally!")
 	})
+	handler.Register(mux)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", options.Port),

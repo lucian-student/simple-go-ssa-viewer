@@ -27,7 +27,7 @@ func Listen(options *ServerOptions) error {
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", options.Port),
-		Handler:      mux,
+		Handler:      EnableCORS(mux),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}

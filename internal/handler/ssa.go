@@ -24,7 +24,7 @@ type GetSSAResponse struct {
 	/*
 		Returns basic block graph
 	*/
-	Packages []*ssaparser.PackageDTO
+	Packages []*ssaparser.PackageDTO `json:"packages"`
 }
 
 func NewGetSSAResponseWithPackage(pkg *ssaparser.PackageDTO) *GetSSAResponse {

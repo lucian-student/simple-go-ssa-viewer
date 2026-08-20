@@ -39,9 +39,9 @@ func NewFunctionDTO(path, name string, blocks []*CodeBlockDTO) *FunctionDTO {
 	}
 }
 
-func NewCodeBlockDTO() *CodeBlockDTO {
+func NewCodeBlockDTO(index int) *CodeBlockDTO {
 	return &CodeBlockDTO{
-		Index:        0,
+		Index:        index,
 		Instructions: make([]*InstructionDTO, 0),
 		Succs:        make([]int, 0),
 		Preds:        make([]int, 0),
@@ -66,7 +66,7 @@ func CreateGraph(fn *ssa.Function) []*CodeBlockDTO {
 
 	for _, block := range fn.Blocks {
 
-		blockDTO := NewCodeBlockDTO()
+		blockDTO := NewCodeBlockDTO(block.Index)
 
 		blocks = append(blocks, blockDTO)
 		for _, instr := range block.Instrs {

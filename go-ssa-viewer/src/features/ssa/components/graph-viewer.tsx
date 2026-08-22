@@ -1,11 +1,16 @@
-import { useSSAData } from "../api/ssa"
+import { useSSA } from "../api/ssa"
+import useSSAStore from "../useSSAStore"
 
 
 function GraphViewer() {
+    const { code } = useSSAStore()
+    const { data, error, isPending } = useSSA({ code })
 
-    const { data } = useSSAData()
+    if (isPending) {
+        return <>Wait</>
+    }
 
-    if (!data) {
+    if (error) {
         return <>No data</>
     }
 
@@ -26,7 +31,7 @@ function GraphViewer() {
             {firstFunction.blocks.map(block => {
                 return (
                     <ul key={block.index}>
-                        {block.instructions.map((instr,index) => {
+                        {block.instructions.map((instr, index) => {
                             return (
                                 <li key={index}>{instr.text}</li>
                             )

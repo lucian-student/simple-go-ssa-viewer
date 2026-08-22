@@ -2,27 +2,21 @@ import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror';
 import { go } from '@codemirror/lang-go'
 import { autocompletion } from "@codemirror/autocomplete";
 import useDebounce from '@/utils/debounce';
-import { useState } from 'react';
 import { useSSA } from '../api/ssa';
+import useSSAStore, { DEFAULT_CODE } from '../useSSAStore';
 
-const DEFAULT_CODE = [
-    "package main",
-    "",
-    "import \"fmt\"",
-    "",
-    "func add(a,b int) int{",
-    "   return a + b",
-    "}",
-    "",
-    "func main(){",
-    "   fmt.Printf(\"Hello world\")",
-    "}",
-].join("\n")
 
+
+/*
+Musím přidat logiku, která umožní vybrat funkci
+*/
 function Editor() {
-    const [code, setCode] = useState(DEFAULT_CODE)
+
+    const { code, setCode } = useSSAStore()
     const debouncedCode = useDebounce(code)
     useSSA({ code: debouncedCode })
+
+    
 
     return (
         <>

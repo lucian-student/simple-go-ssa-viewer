@@ -1,9 +1,10 @@
-import CodeMirror, { ViewUpdate } from '@uiw/react-codemirror';
+import CodeMirror, { ViewUpdate, type ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { go } from '@codemirror/lang-go'
 import { autocompletion } from "@codemirror/autocomplete";
 import useDebounce from '@/utils/debounce';
 import { useSSA } from '../api/ssa';
 import useSSAStore, { DEFAULT_CODE } from '../useSSAStore';
+import { useRef } from 'react';
 
 
 
@@ -16,11 +17,14 @@ function Editor() {
     const debouncedCode = useDebounce(code)
     useSSA({ code: debouncedCode })
 
-    
+    const editorRef = useRef<ReactCodeMirrorRef | null>(null)
+
 
     return (
         <>
-            <CodeMirror value={DEFAULT_CODE} extensions={[go(), autocompletion()]} onChange={(text: string, _: ViewUpdate) => {
+            <CodeMirror ref={(refData) => {
+                editorRef.current = refData
+            }} value={DEFAULT_CODE} extensions={[go(), autocompletion()]} onChange={(text: string, _: ViewUpdate) => {
                 setCode(text)
             }} />
         </>

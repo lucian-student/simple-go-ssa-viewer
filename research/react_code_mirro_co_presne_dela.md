@@ -34,7 +34,7 @@ export function useCodeMirror(props: UseCodeMirror) {
   const [state, setState] = useState<EditorState>();//takže v tomto příapdě je typ EditorState | undefined a původní hodnota je undefined
   const typingLatch = useState<{ current: TimeoutLatch | null }>(() => ({ current: null }))[0];
   const pendingUpdate = useState<{ current: (() => void) | null }>(() => ({ current: null }))[0];
-  const defaultThemeOption = getDimensionTheme(height, minHeight, maxHeight, width, minWidth, maxWidth);
+  const defaultThemeOption = getDimensionTheme(height, minHeight, maxHeight, width, minWidth, maxWidth);//vrati se 3 FacetProvidery
   const updateListener = EditorView.updateListener.of((vu: ViewUpdate) => {
     if (
       vu.docChanged &&
@@ -234,6 +234,8 @@ export function getDimensionTheme(
       maxWidth,
     },
   });
-  return lastDimensionTheme;
+  //export type Extension = {extension: Extension} | readonly Extension[], takže asi z jevně FacetProvider má na sobě property extension
+  return lastDimensionTheme; // vrátí 2-3 facet providery v Array, z nějakého důvodu se to považuje za typ Extension
 }
 ```
+

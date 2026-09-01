@@ -20,10 +20,17 @@ function Editor() {
     const editorRef = useRef<ReactCodeMirrorRef | null>(null)
 
 
+    
+
     return (
         <>
             <CodeMirror ref={(refData) => {
                 editorRef.current = refData
+                if(refData && refData.view){
+                    console.log(refData.view.root)
+                    console.log(document)
+                }
+
             }} value={DEFAULT_CODE} extensions={[go(), autocompletion()]} onChange={(text: string, _: ViewUpdate) => {
                 setCode(text)
             }} />

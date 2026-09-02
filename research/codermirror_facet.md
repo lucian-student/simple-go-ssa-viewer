@@ -38,3 +38,15 @@ Vrací Facet Provider
 ## computeN: metoda
 
 ## from: metoda
+
+# Adresy: getAddr
+
+```
+export function getAddr(state: EditorState, addr: number) {
+  return addr & 1 ? state.config.staticValues[addr >> 1] : state.values[addr >> 1]
+}
+```
+1. Z toho, co chápu, tak adresa obsahuje jako první "bit" 1/0 podle toho jestli je to statická, nebo možná dynamická hodnota
+
+
+# Adresy: ensureAddr

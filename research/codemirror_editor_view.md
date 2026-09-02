@@ -94,9 +94,17 @@ static theme(spec: {[selector: string]: StyleSpec}, options?: {dark?: boolean}):
 
 
 
-## dispatch - hlavní způsob asi jak se edituje
+## dispatch - hlavní způsob asi jak se edituje stav editoru
 
-* ale zjevně
+```
+dispatch(...input: (Transaction | readonly Transaction[] | TransactionSpec)[]) {
+    let trs = input.length == 1 && input[0] instanceof Transaction ? input as readonly Transaction[]
+      : input.length == 1 && Array.isArray(input[0]) ? input[0] as readonly Transaction[]
+      : [this.state.update(...input as TransactionSpec[])]
+    this.dispatchTransactions(trs, this)
+}
+```
+
 
 ## update
 

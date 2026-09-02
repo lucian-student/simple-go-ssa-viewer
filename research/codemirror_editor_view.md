@@ -94,7 +94,9 @@ static theme(spec: {[selector: string]: StyleSpec}, options?: {dark?: boolean}):
 
 
 
-## dispatch
+## dispatch - hlavní způsob asi jak se edituje
+
+* ale zjevně
 
 ## update
 

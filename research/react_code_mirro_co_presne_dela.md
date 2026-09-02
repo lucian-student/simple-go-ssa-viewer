@@ -32,8 +32,8 @@ export function useCodeMirror(props: UseCodeMirror) {
   const [container, setContainer] = useState<HTMLDivElement | null>();
   const [view, setView] = useState<EditorView>();
   const [state, setState] = useState<EditorState>();//takže v tomto příapdě je typ EditorState | undefined a původní hodnota je undefined
-  const typingLatch = useState<{ current: TimeoutLatch | null }>(() => ({ current: null }))[0];
-  const pendingUpdate = useState<{ current: (() => void) | null }>(() => ({ current: null }))[0];
+  const typingLatch = useState<{ current: TimeoutLatch | null }>(() => ({ current: null }))[0];//hack využivá useState, aby persistnul variablu přes více renderu
+  const pendingUpdate = useState<{ current: (() => void) | null }>(() => ({ current: null }))[0];//stejný hack jako předchozí řádek
   const defaultThemeOption = getDimensionTheme(height, minHeight, maxHeight, width, minWidth, maxWidth);//vrati se 3 FacetProvidery
   const updateListener = EditorView.updateListener.of((vu: ViewUpdate) => {
     if (
@@ -45,7 +45,7 @@ export function useCodeMirror(props: UseCodeMirror) {
     ) {
       if (typingLatch.current) {
         typingLatch.current.reset();
-      } else {
+      } else { // tady ten branch se asi malo, kdy vykoná
         typingLatch.current = new TimeoutLatch(() => {
           if (pendingUpdate.current) {
             const forceUpdate = pendingUpdate.current;
@@ -56,12 +56,12 @@ export function useCodeMirror(props: UseCodeMirror) {
         }, TYPING_TIMOUT);
         getScheduler().add(typingLatch.current);
       }
-
+      // obecně bych si tipnul, že to je hlavní logika která se vykoná a předchozí ify se asi moc často vykonávat nebudou
       const doc = vu.state.doc;
       const value = doc.toString();
-      onChange(value, vu);
+      onChange(value, vu);//onChange callback dostane aktuální obsah editoru a VieuwUpdate, to mě asi nezajímá pro úpravu tooltipu
     }
-    onStatistics && onStatistics(getStatistics(vu));
+    onStatistics && onStatistics(getStatistics(vu));//to mě asi taky nezajímá pro úpravu tooltipu
   });
 
   const defaultExtensions = getDefaultExtensions({
@@ -71,10 +71,10 @@ export function useCodeMirror(props: UseCodeMirror) {
     placeholder: placeholderStr,
     indentWithTab: defaultIndentWithTab,
     basicSetup: defaultBasicSetup,
-  });
+  });//vratí Array<FacetProvider> asi i když to nazývají spíš Array<Extension>
 
   let getExtensions = [
-    updateListener,
+    updateListener, // Facet.define<(update: ViewUpdate) => void>().of, takže facet provider
     ...(defaultThemeOption ? [defaultThemeOption] : []),
     scrollerTheme,
     ...defaultExtensions,
@@ -83,7 +83,7 @@ export function useCodeMirror(props: UseCodeMirror) {
   if (onUpdate && typeof onUpdate === 'function') {
     getExtensions.push(EditorView.updateListener.of(onUpdate));
   }
-  getExtensions = getExtensions.concat(extensions);
+  getExtensions = getExtensions.concat(extensions);//takže v podstatě +-, to je asi seznam FacetProviderů
 
   useLayoutEffect(() => {
     if (container && !state) {
@@ -94,7 +94,7 @@ export function useCodeMirror(props: UseCodeMirror) {
       };
       const stateCurrent = initialState
         ? EditorState.fromJSON(initialState.json, config, initialState.fields)
-        : EditorState.create(config);
+        : EditorState.create(config);// spíš se v mojem případě stane nejdřív EditorState.create(config)
       setState(stateCurrent);
       if (!view) {
         const viewCurrent = new EditorView({
@@ -112,13 +112,13 @@ export function useCodeMirror(props: UseCodeMirror) {
         setView(undefined);
       }
     };
-  }, [container, state]);
+  }, [container, state]);// tenhle useLayoutEffect se volá před tím než se browser renderuje, takže udajně předchaází flickeringu, kdyby se po renderu něco updatnulo, tak to by mohlo změnit vzhled websity a působilo by to flickering
 
   useEffect(() => {
     if (props.container) {
       setContainer(props.container);
     }
-  }, [props.container]);
+  }, [props.container]);//nastaví container, nevim jestli je to k něčemu
 
   useEffect(
     () => () => {
@@ -132,17 +132,17 @@ export function useCodeMirror(props: UseCodeMirror) {
       }
     },
     [view],
-  );
+  );//cleanup useEffect, nevim proč ten přechozí, taky trochu dělá cleanup
 
   useEffect(() => {
     if (autoFocus && view) {
       view.focus();
     }
-  }, [autoFocus, view]);
+  }, [autoFocus, view]);//okey asi to zaostří na view
 
   useEffect(() => {
     if (view) {
-      view.dispatch({ effects: StateEffect.reconfigure.of(getExtensions) });
+      view.dispatch({ effects: StateEffect.reconfigure.of(getExtensions) });//
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -161,7 +161,7 @@ export function useCodeMirror(props: UseCodeMirror) {
     defaultBasicSetup,
     onChange,
     onUpdate,
-  ]);
+  ]);//
 
   useEffect(() => {
     if (value === undefined) {
@@ -186,10 +186,111 @@ export function useCodeMirror(props: UseCodeMirror) {
         pendingUpdate.current = forceUpdate;
       }
     }
-  }, [value, view]);
+  }, [value, view]);//useEffect, který v přpadě změny "value" zmení obsah editoru, aby editor byl efektivní, tak value by se neměla měnit
 
   return { state, setState, view, setView, container, setContainer };
 }
+```
+
+## TimeoutLatch
+
+```
+export class TimeoutLatch {
+  private timeLeftMS: number;
+  private timeoutMS: number;
+  private isCancelled = false;
+  private isTimeExhausted = false;
+  private callbacks: Function[] = [];
+
+  constructor(callback: Function, timeoutMS: number) {
+    this.timeLeftMS = timeoutMS;
+    this.timeoutMS = timeoutMS;
+    this.callbacks.push(callback);
+  }
+
+  tick(): void {
+    if (!this.isCancelled && !this.isTimeExhausted) {
+      this.timeLeftMS--;
+      if (this.timeLeftMS <= 0) {
+        this.isTimeExhausted = true;
+        const callbacks = this.callbacks.slice();
+        this.callbacks.length = 0;
+        callbacks.forEach((callback) => {
+          try {
+            callback();
+          } catch (error) {
+            console.error('TimeoutLatch callback error:', error);
+          }
+        });
+      }
+    }
+  }
+
+  cancel(): void {
+    this.isCancelled = true;
+    this.callbacks.length = 0;
+  }
+
+  reset(): void {
+    this.timeLeftMS = this.timeoutMS;
+    this.isCancelled = false;
+    this.isTimeExhausted = false;
+  }
+
+  get isDone(): boolean {
+    return this.isCancelled || this.isTimeExhausted;
+  }
+}
+
+
+class Scheduler {
+  private interval: NodeJS.Timeout | null = null;
+  private latches = new Set<TimeoutLatch>();
+
+  add(latch: TimeoutLatch): void {
+    this.latches.add(latch);
+    this.start();
+  }
+
+  remove(latch: TimeoutLatch): void {
+    this.latches.delete(latch);
+    if (this.latches.size === 0) {
+      this.stop();
+    }
+  }
+
+  private start(): void {
+    if (this.interval === null) {
+      this.interval = setInterval(() => {
+        this.latches.forEach((latch) => {
+          latch.tick();
+          if (latch.isDone) {
+            this.remove(latch);
+          }
+        });
+      }, 1);//asi dost brutalně neefektivní, když se volá tenhle callback každou milisekundu[Neefektivní]
+    }
+  }
+
+  private stop(): void {
+    if (this.interval !== null) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+}
+
+let globalScheduler: Scheduler | null = null;
+
+export const getScheduler = (): Scheduler => {
+  if (typeof window === 'undefined') {
+    return new Scheduler();
+  }
+  if (!globalScheduler) {
+    globalScheduler = new Scheduler();
+  }
+  return globalScheduler;
+};fdfddsdsdsdfesdsdsds
 ```
 
 ## getDimensionTheme
@@ -239,3 +340,52 @@ export function getDimensionTheme(
 }
 ```
 
+###
+
+```
+export const getDefaultExtensions = (optios: DefaultExtensionsOptions = {}): Extension[] => {
+  const {
+    indentWithTab: defaultIndentWithTab = true,
+    editable = true,
+    readOnly = false,
+    theme = 'light',
+    placeholder: placeholderStr = '',
+    basicSetup: defaultBasicSetup = true,
+  } = optios;
+  const getExtensions: Extension[] = [];
+  if (defaultIndentWithTab) {
+    getExtensions.unshift(keymap.of([indentWithTab]));//export const keymap = Facet.define<readonly KeyBinding[]>({enables: handleKeyEvents})
+  }
+  if (defaultBasicSetup) {
+    if (typeof defaultBasicSetup === 'boolean') {
+      getExtensions.unshift(basicSetup());
+    } else {
+      getExtensions.unshift(basicSetup(defaultBasicSetup));
+    }
+  }
+  if (placeholderStr) {
+    getExtensions.unshift(placeholder(placeholderStr));
+  }
+  switch (theme) {
+    case 'light':
+      getExtensions.push(defaultLightThemeOption);
+      break;
+    case 'dark':
+      getExtensions.push(oneDark);
+      break;
+    case 'none':
+      break;
+    default:
+      getExtensions.push(theme);
+      break;
+  }
+  if (editable === false) {
+    getExtensions.push(EditorView.editable.of(false));
+  }
+  if (readOnly) {
+    getExtensions.push(EditorState.readOnly.of(true));
+  }
+
+  return [...getExtensions];//vracíto asi FacetProvidery
+};
+```

@@ -26,12 +26,13 @@ function Editor() {
         <>
             <CodeMirror ref={(refData) => {
                 editorRef.current = refData
-                if(refData && refData.view){
-                    console.log(refData.view.root)
-                    console.log(document)
+                if(refData && refData.view && refData.state){
+                    //console.log(refData.view.root)
+                    //console.log(document)
+                    console.log(refData.state.doc)
                 }
 
-            }} value={DEFAULT_CODE} extensions={[go(), autocompletion()]} onChange={(text: string, _: ViewUpdate) => {
+            }} value={code} extensions={[go(), autocompletion()]} onChange={(text: string, _: ViewUpdate) => {
                 setCode(text)
             }} />
         </>

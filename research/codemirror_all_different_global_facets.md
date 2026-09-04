@@ -5,4 +5,5 @@ const initField = Facet.define<{field: StateField<unknown>, create: (state: Edit
 
 //Facet<Input,Output=Input>
 //{field: StateField<unknown>, create: (state: EditorState) => unknown}
+//
 ```

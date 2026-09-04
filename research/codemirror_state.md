@@ -7,6 +7,10 @@
 
 Extensions
 
+parametry:
+* config: Configuration
+* values: any[]
+
 ## create - konstruktor
 
 ```
@@ -30,4 +34,18 @@ static create(config: EditorStateConfig = {}): EditorState {
     return new EditorState(configuration, doc, selection, configuration.dynamicSlots.map(() => null),
                            (state, slot) => slot.create(state), null)
   }
+```
+
+## Facet
+
+zajimavost:
+* adresy jsou v this.config.address
+
+```
+facet<Output>(facet: FacetReader<Output>): Output {
+    let addr = this.config.address[facet.id]
+    if (addr == null) return facet.default
+    ensureAddr(this, addr)
+    return getAddr(this, addr)
+}
 ```

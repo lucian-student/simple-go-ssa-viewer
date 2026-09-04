@@ -44,11 +44,17 @@ slot(addresses: {[id: number]: number}): DynamicSlot {
         let value = this.updateF(oldVal, tr)
         if (this.compareF(oldVal, value)) return 0
         state.values[idx] = value
-        return SlotStatus.Changed
+        return SlotStatus.Changed //updatne hodnotu
       },
       reconfigure: (state, oldState) => {
-        let init = state.facet(initField), oldInit = oldState.facet(initField), reInit
-        if ((reInit = init.find(i => i.field == this)) && reInit != oldInit.find(i => i.field == this)) {
+        //let init = state.facet(initField),oldInit = oldState.facet(initField),reInit
+
+        //jelikož typ initField Facet je: {field: StateField<unknown>, create: (state: EditorState) => unknown}
+        //tak nevim, kde se bere ten find jestli se vráti Array
+        let init = state.facet(initField)
+        let oldInit = oldState.facet(initField)
+        let reInit //i guess default is undefined
+        if ((reInit = init.find(i => i.field == this)) && reInit != oldInit.find(i => i.field == this)) {//
           state.values[idx] = reInit.create(state)
           return SlotStatus.Changed
         }

@@ -29,7 +29,8 @@ function Editor() {
                 if(refData && refData.view && refData.state){
                     //console.log(refData.view.root)
                     //console.log(document)
-                    console.log(refData.state.doc)
+                    //console.log(refData.state.doc)
+                    console.log(refData.state)
                 }
 
             }} value={code} extensions={[go(), autocompletion()]} onChange={(text: string, _: ViewUpdate) => {

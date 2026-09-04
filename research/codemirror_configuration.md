@@ -7,6 +7,7 @@ parametry:
 3. readonly dynamicSlots: DynamicSlot[]
       * [DynamicSlot](./codemirror_facet_provider.md#dynamicslot---metoda)
 4. readonly address: {[id: number]: number}
+      * adresy, kde jsou uložený Outputy FacetProviderů/Facet
 5. readonly staticValues: readonly any[]
 6. readonly facets: {[id: number]: readonly FacetProvider<any>[]}
 

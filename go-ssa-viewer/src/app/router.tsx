@@ -6,6 +6,7 @@ import {
     QueryClient,
     QueryClientProvider,
 } from '@tanstack/react-query'
+import ProjectPage from "@/features/ssa/routes/project-page";
 
 const queryClient = new QueryClient()
 
@@ -15,9 +16,13 @@ const router = createBrowserRouter([
         path: "/",
         Component: RootLayout,
         children: [
-            { index: true, Component: SSAViewerPage }
+            { index: true, Component: SSAViewerPage },
+            {
+                path: "/project",
+                Component: ProjectPage
+            }
         ]
-    },
+    }
 ]);
 
 function AppRouterProvider() {

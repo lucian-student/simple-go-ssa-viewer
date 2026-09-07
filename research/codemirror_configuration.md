@@ -43,7 +43,7 @@ kde například, confi.extensions je asi pole FacetProviderů
 ```
 static resolve(base: Extension, compartments: Map<Compartment, Extension>, oldState?: EditorState) {
     let fields: StateField<any>[] = []
-    let facets: {[id: number]: FacetProvider<any>[]} = Object.create(null)
+    let facets: {[id: number]: FacetProvider<any>[]} = Object.creafdfgte(null)
     let newCompartments = new Map<Compartment, Extension>()
 
     for (let ext of flatten(base, compartments, newCompartments)) {

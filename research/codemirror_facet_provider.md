@@ -23,6 +23,11 @@ Input
 
 ## dynamicSlot -> metoda
 
+Poznamka:
+* Tato metoda se volá pouze v případě asi, když je provider asi Single/Multi, když není static
+  * const enum Provider { Static, Single, Multi }
+  * v příapdě, že je asi static, tak this.value není hodnota, kterou asi provider vrací, ale hodntoa, která se vy počítá z stavu Editoru
+
 interface DynamicSlot {
   create(state: EditorState): SlotStatus
   update(state: EditorState, tr: Transaction): SlotStatus

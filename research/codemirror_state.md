@@ -23,7 +23,7 @@ export interface EditorStateConfig {
 
 ```
 static create(config: EditorStateConfig = {}): EditorState {
-    let configuration = Configuration.resolve(config.extensions || [], new Map)
+    let configuration = Configuration.resolve(config.extensions || [], new Map)//
     let doc: Text = config.doc instanceof Text ? config.doc
       : Text.of((config.doc || "").split(configuration.staticFacet(EditorState.lineSeparator) || DefaultSplit))
     let selection = !config.selection ? EditorSelection.single(0)

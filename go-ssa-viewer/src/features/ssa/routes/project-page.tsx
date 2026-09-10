@@ -1,11 +1,6 @@
 function ProjectPage() {
 
     const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-
-        //zabrani vytvoření onContextMenu
-        //jelikož chci v codemirror tohle udělat, tak potřebujue tomu předejít
-        e.preventDefault();
-
         //potom potř
         console.log({ x: e.clientX, y: e.clientY })
 

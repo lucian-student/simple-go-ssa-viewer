@@ -6,7 +6,9 @@ import { useSSA } from '../api/ssa';
 import useSSAStore from '../useSSAStore';
 import { useRef } from 'react';
 import useContextMenu from '../hooks/use-context-menu';
-
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { type MenuRoot } from '@base-ui/react';
 
 /*
 Musím přidat logiku, která umožní vybrat funkci
@@ -21,6 +23,11 @@ function Editor() {
 
     const { isOpen, close, context_menu_handler } = useContextMenu()
 
+    const onChange = (open: boolean, _: MenuRoot.ChangeEventDetails) => {
+        if (!open) {
+            close()
+        }
+    }
 
     return (
         <>
@@ -39,6 +46,18 @@ function Editor() {
             }} value={code} extensions={[go(), autocompletion(), context_menu_handler]} onChange={(text: string, _: ViewUpdate) => {
                 setCode(text)
             }} />
+            <DropdownMenu open={isOpen} onOpenChange={onChange}>
+                {/*<DropdownMenuTrigger render={<Button variant="outline">Open</Button>} />*/}
+                <DropdownMenuTrigger render={<Button variant="outline">Open</Button>} />
+                <DropdownMenuContent ref={(data) => {
+                    if (data) {
+                        console.log(data.classList.toString())
+                    }
+                }}>
+                    <DropdownMenuItem>Display SSA Graph</DropdownMenuItem>
+                    <DropdownMenuItem>Display Call Graph</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </>
     )
 }

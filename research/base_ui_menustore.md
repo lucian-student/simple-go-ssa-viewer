@@ -68,7 +68,7 @@ něco jak useSynced, ale braní undefined hodnotě, takže hodnota asi nemůže 
 
 ### select<Key extends keyof Selectors>,select(key: keyof Selectors, a1?: unknown, a2?: unknown, a3?: unknown)
 
-Konkreétní případ selectorů, z toho, co jsem pochopil, tak to jsou gettery v podstatě, takže select veme a zavolá getter
+Konkreétní případ selectorů, z toho, co jsem pochopil, tak to jsou gettery v podstatě, takže select veme a zavolá getter.
 ```
 const selectors = {
   ...popupStoreSelectors,
@@ -139,9 +139,8 @@ function createInitialContext(triggerElements: PopupTriggerMap): Context {
 }
 ```
 
-### useState<Key extends keyof Selectors>
+### useState<Key extends keyof Selectors> využívá useSyncExternalStore
 
-//TODO
 
 ### useContextCallback<Key extends ContextFunctionKeys<Context>>
 

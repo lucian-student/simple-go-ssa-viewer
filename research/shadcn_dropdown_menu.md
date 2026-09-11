@@ -162,15 +162,15 @@ export const MenuRoot = fastComponent(function MenuRoot<Payload>(props: MenuRoot
     floatingParentNodeIdFromContext != null,
   );//jediný, co vim, tak slouží pro uložení MenuStore třídy, v useRefu, důvod, aby přežila třída rerendery
 
-  store.useControlledProp('openProp', openProp);//
-  store.useControlledProp('triggerIdProp', triggerIdProp);//
+  store.useControlledProp('openProp', openProp);//basically říká, že nastavuju hodnotu "openProp" na proměnnou openProp a nepovoluje se undefined
+  store.useControlledProp('triggerIdProp', triggerIdProp);////to stejné zde
 
-  store.useContextCallback('onOpenChangeComplete', onOpenChangeComplete);
+  store.useContextCallback('onOpenChangeComplete', onOpenChangeComplete);//přida funkci contextu
 
-  const floatingTreeRoot = store.useState('floatingTreeRoot');
-  const floatingNodeIdFromContext = useFloatingNodeId(floatingTreeRoot);
+  const floatingTreeRoot = store.useState('floatingTreeRoot');//basically pozoruje danou hodnotu
+  const floatingNodeIdFromContext = useFloatingNodeId(floatingTreeRoot);//nějaký id
 
-  const open = store.useState('open');
+  const open = store.useState('open');//pozoruje danou hodnotu
   const activeTriggerElement = store.useState('activeTriggerElement');
   const positionerElement = store.useState('positionerElement');
   const hoverEnabled = store.useState('hoverEnabled');
